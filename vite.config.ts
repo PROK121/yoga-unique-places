@@ -14,6 +14,11 @@ export default defineConfig({
     host: true,
     port: 5173,
   },
+  /** `vite preview` (npm start на Render): прокси передаёт Host *.onrender.com — иначе «Blocked request». */
+  preview: {
+    host: true,
+    allowedHosts: true,
+  },
   base,
   resolve: {
     alias: {
