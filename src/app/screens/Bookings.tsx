@@ -37,14 +37,18 @@ export default function Bookings() {
     setTelegramPayUrl(p?.url ?? null);
   }, [searchParams, upcoming]);
 
+  /** Не очищать ссылку в первый кадр: контекст броней может обновиться позже navigate — иначе на телефоне пропадала запасная кнопка Telegram. */
   useEffect(() => {
-    const anyPaymentPending = upcoming.some(
-      (b) => b.paymentOrderId && b.paymentStatus === 'pending',
-    );
-    if (!anyPaymentPending) {
-      clearPendingTelegramPay();
-      setTelegramPayUrl(null);
-    }
+    const t = window.setTimeout(() => {
+      const anyPaymentPending = upcoming.some(
+        (b) => b.paymentOrderId && b.paymentStatus === 'pending',
+      );
+      if (!anyPaymentPending) {
+        clearPendingTelegramPay();
+        setTelegramPayUrl(null);
+      }
+    }, 1500);
+    return () => window.clearTimeout(t);
   }, [upcoming]);
 
   if (!ready) {
@@ -111,31 +115,36 @@ export default function Bookings() {
       )}
 
       {telegramPayUrl && (
-        <div className="fixed bottom-24 left-4 right-4 z-40 max-w-md mx-auto">
-          <div className="bg-indigo-600 text-white rounded-2xl p-4 shadow-xl border border-indigo-500/30">
-            <p className="text-sm font-medium mb-3">Оплата в Telegram</p>
-            <p className="text-xs text-indigo-100 mb-3">
-              Если чат не открылся автоматически, нажмите кнопку (в приложениях вроде Instagram сначала
-              откройте сайт в Safari/Chrome).
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="telegram-pay-title"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-gray-100">
+            <p id="telegram-pay-title" className="text-lg font-bold text-gray-900 mb-2">
+              Оплата в Telegram
             </p>
-            <div className="flex gap-2">
-              <a
-                href={telegramPayUrl}
-                className="flex-1 text-center py-3 rounded-xl bg-white text-indigo-700 font-semibold text-sm"
-              >
-                Открыть Telegram
-              </a>
-              <button
-                type="button"
-                onClick={() => {
-                  clearPendingTelegramPay();
-                  setTelegramPayUrl(null);
-                }}
-                className="px-4 py-3 rounded-xl bg-indigo-500/80 text-white text-sm font-medium"
-              >
-                Скрыть
-              </button>
-            </div>
+            <p className="text-sm text-gray-600 mb-6">
+              Нажмите кнопку ниже — откроется чат бота с суммой и Kaspi. На телефоне так надёжнее,
+              чем автоматический переход.
+            </p>
+            <a
+              href={telegramPayUrl}
+              className="block w-full text-center py-4 rounded-xl bg-indigo-600 text-white font-semibold text-base mb-3"
+            >
+              Открыть Telegram
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                clearPendingTelegramPay();
+                setTelegramPayUrl(null);
+              }}
+              className="w-full py-3 text-sm font-medium text-gray-600"
+            >
+              Позже, я в «Мои брони»
+            </button>
           </div>
         </div>
       )}

@@ -37,9 +37,22 @@ export function clearPendingTelegramPay() {
 }
 
 /**
- * Открыть Telegram после async (создание заказа). Не используем window.open —
- * на телефонах его часто блокируют после await. Полный переход по https://t.me/…
- * открывает приложение Telegram.
+ * Телефоны и планшеты: после `fetch` надёжнее не дергать `location.assign`, а показать
+ * пользователю настоящую ссылку `<a href>` (см. экран «Мои брони»).
+ */
+export function prefersManualTelegramLink(): boolean {
+  if (typeof window === 'undefined') return false;
+  const coarse =
+    typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+  const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0;
+  const narrow =
+    typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 900px)').matches;
+  return coarse || (touch && narrow);
+}
+
+/**
+ * Открыть Telegram после async (создание заказа). На десктопе — переход по https://t.me/…
+ * (не window.open — его режут после await).
  */
 export function openTelegramForPayment(telegramDeepLink: string) {
   window.location.assign(telegramDeepLink);

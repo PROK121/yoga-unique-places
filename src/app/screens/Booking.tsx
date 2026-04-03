@@ -9,7 +9,11 @@ import { parseLocalDate } from '../lib/bookingCalendar';
 import { levelLabel } from '../lib/i18n';
 import { formatKzt } from '../lib/format';
 import { createPaymentOrder, isPaymentApiConfigured } from '../lib/paymentApi';
-import { openTelegramForPayment, rememberPendingTelegramPay } from '../lib/telegramDeepLink';
+import {
+  openTelegramForPayment,
+  prefersManualTelegramLink,
+  rememberPendingTelegramPay,
+} from '../lib/telegramDeepLink';
 import { toast } from 'sonner';
 
 export default function Booking() {
@@ -67,7 +71,9 @@ export default function Booking() {
           });
           rememberPendingTelegramPay(order.telegramDeepLink);
           navigate('/bookings?success=true');
-          openTelegramForPayment(order.telegramDeepLink);
+          if (!prefersManualTelegramLink()) {
+            openTelegramForPayment(order.telegramDeepLink);
+          }
           return;
         }
 
@@ -84,8 +90,12 @@ export default function Booking() {
           );
         }
       } else {
-        toast.message('Бронь сохранена', {
-          description: 'Укажите VITE_SUPPORT_API_URL для оплаты через Telegram и Kaspi.',
+        toast.message('Бронь сохранена. Онлайн-оплата недоступна', {
+          description:
+            import.meta.env.DEV
+              ? 'Создайте .env.local в корне проекта: VITE_SUPPORT_API_URL=http://127.0.0.1:8787 и перезапустите npm run dev.'
+              : 'В панели хостинга (Render и т.п.) добавьте переменную VITE_SUPPORT_API_URL = публичный HTTPS-URL сервера (node server/telegram-support.mjs), не localhost. Сохраните и выполните новый деплой.',
+          duration: 14_000,
         });
       }
 
