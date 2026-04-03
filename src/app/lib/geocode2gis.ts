@@ -1,8 +1,14 @@
 /** Обратное геокодирование 2GIS Catalog API (тот же ключ, что и для MapGL). */
 
-/** Ключ из `.env`: только `VITE_2GIS_API_KEY` — в Vite без префикса `VITE_` переменные в клиент не попадают. */
+/**
+ * Ключ MapGL / Catalog API. В Vite в клиент попадают только переменные с префиксом `VITE_`.
+ * Поддерживаются запасные имена — если в .env указали другое имя.
+ */
 export function get2gisApiKey(): string {
-  return (import.meta.env.VITE_2GIS_API_KEY as string | undefined)?.trim() ?? '';
+  const env = import.meta.env as Record<string, string | undefined>;
+  const raw =
+    env.VITE_2GIS_API_KEY || env.VITE_MAPGL_KEY || env.VITE_2GIS_KEY || env.VITE_DGIS_API_KEY;
+  return raw?.trim() ?? '';
 }
 
 function pickAddressFromItem(item: Record<string, unknown>): string | null {

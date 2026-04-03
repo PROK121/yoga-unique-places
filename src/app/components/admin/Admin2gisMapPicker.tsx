@@ -80,19 +80,40 @@ export function Admin2gisMapPicker({ formKey, lat, lng, onCoordinatesChange }: P
     return (
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
         <p className="font-medium">Карта 2GIS</p>
-        <p className="mt-1 text-xs leading-relaxed">
-          Задайте в <code className="rounded bg-amber-100 px-1">.env.local</code> переменную{' '}
-          <code className="rounded bg-amber-100 px-1">VITE_2GIS_API_KEY</code> (именно с префиксом{' '}
-          <code className="rounded bg-amber-100 px-1">VITE_</code>) — ключ из{' '}
-          <a
-            href="https://dev.2gis.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline font-medium"
-          >
-            кабинета разработчика 2GIS
-          </a>
-          . Без ключа доступны поля координат ниже и геолокация.
+        <p className="mt-1 text-xs leading-relaxed space-y-2">
+          <span className="block">
+            Ключ не подхвачен приложением. Нужна переменная окружения{' '}
+            <code className="rounded bg-amber-100 px-1">VITE_2GIS_API_KEY</code> (только с префиксом{' '}
+            <code className="rounded bg-amber-100 px-1">VITE_</code>
+            ), значение — из{' '}
+            <a
+              href="https://dev.2gis.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-medium"
+            >
+              dev.2gis.com
+            </a>
+            .
+          </span>
+          {import.meta.env.DEV ? (
+            <span className="block text-amber-800">
+              Локально: в <strong>корне проекта</strong> создайте или правьте{' '}
+              <code className="rounded bg-amber-100 px-1">.env.local</code>, строка вида{' '}
+              <code className="rounded bg-amber-100 px-1 break-all">
+                VITE_2GIS_API_KEY=ваш_ключ
+              </code>
+              , затем <strong>остановите и снова запустите</strong> <code>npm run dev</code>.
+            </span>
+          ) : (
+            <span className="block text-amber-800">
+              На продакшене (Render и т.д.): добавьте <code className="rounded bg-amber-100 px-1">VITE_2GIS_API_KEY</code> в Environment и{' '}
+              <strong>пересоберите</strong> проект — иначе ключ не попадёт в сборку.
+            </span>
+          )}
+          <span className="block text-amber-800/90">
+            Без ключа карта скрыта; координаты можно ввести вручную или через «Моё местоположение».
+          </span>
         </p>
       </div>
     );
