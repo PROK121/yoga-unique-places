@@ -8,6 +8,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+# Локальный файл каталога с API-сервера (node server/telegram-support.mjs)
+data/
 dist
 dist-ssr
 *.local
